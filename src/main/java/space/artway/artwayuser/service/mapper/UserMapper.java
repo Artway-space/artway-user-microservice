@@ -28,6 +28,7 @@ public class UserMapper {
         user.setEmail(entity.getEmail());
         user.setPhone(entity.getPhone());
         user.setCountry(entity.getCountry());
+        user.setActivated(entity.isActivated());
         return user;
     }
 }

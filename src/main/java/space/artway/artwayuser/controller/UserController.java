@@ -1,5 +1,6 @@
 package space.artway.artwayuser.controller;
 
+import space.artway.artwayuser.controller.utils.ManagedUser;
 import space.artway.artwayuser.service.UserService;
 import space.artway.artwayuser.service.dto.UserDto;
 import org.springframework.http.HttpStatus;
@@ -20,11 +21,11 @@ public class UserController {
 
     @PostMapping("/signUp")
     @ResponseStatus(HttpStatus.CREATED)
-    public void signUp(@Valid @RequestBody UserDto user){
+    public void signUp(@Valid @RequestBody ManagedUser user){
 //        if(!passwordChecker(managedUser.getPassword())){
 //            throw new InvalidPasswordException();
 
-         userService.createUser(user, "12345");
+         userService.createUser(user, user.getPassword());
     }
 
     @GetMapping("/activate")

@@ -1,5 +1,6 @@
 package space.artway.artwayuser.service;
 
+import space.artway.artwayuser.controller.exceptions.UserAlreadyExistException;
 import space.artway.artwayuser.domain.User;
 import space.artway.artwayuser.repository.UserRepository;
 import space.artway.artwayuser.service.dto.UserDto;
@@ -14,7 +15,7 @@ import java.util.UUID;
 public class UserService {
     private final UserRepository userRepository;
     private final UserMapper mapper;
-private final EmailService emailService;
+    private final EmailService emailService;
 
     public UserService(UserRepository userRepository, UserMapper mapper, EmailService emailService) {
         this.userRepository = userRepository;
@@ -32,7 +33,7 @@ private final EmailService emailService;
 
     public void createUser(UserDto userDto, String passwordHash) {
         if (userRepository.findByUsername(userDto.getUsername()).isPresent()) {
-
+            throw new UserAlreadyExistException();
         }
         User user = mapper.toEntity(userDto);
         user.setPasswordHash(passwordHash);
