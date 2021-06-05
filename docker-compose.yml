@@ -1,0 +1,6 @@
+version: '2.0'
+
+services:
+  artway-users-microservice:
+    build: .
+    image: artway/users-ms:v2.0
