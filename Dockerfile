@@ -1,4 +1,4 @@
 FROM arm32v7/openjdk
-ADD target/artway-user-ms.jar artway-user-ms.jar
+ADD target/artway-user.jar artway-user.jar
 EXPOSE 8081
-ENTRYPOINT ["java", "-jar", "/artway-user-ms.jar"]
+ENTRYPOINT ["java", "-jar", "/artway-user.jar"]
