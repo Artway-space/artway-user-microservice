@@ -105,6 +105,7 @@
     </dependencyManagement>
 
     <build>
+        <finalName>artway-userr</finalName>
         <plugins>
 <!--            <plugin>-->
 <!--                <groupId>org.springframework.cloud</groupId>-->
