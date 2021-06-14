@@ -1,5 +1,6 @@
 package space.artway.artwayuser.service;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.mail.javamail.MimeMessagePreparator;
@@ -11,6 +12,10 @@ import org.thymeleaf.context.Context;
 public class EmailService {
     private final JavaMailSender mailSender;
     private final TemplateEngine templateEngine;
+    @Value("${artway.userms.host}")
+    private String HOST;
+    @Value("${server.port}")
+    private String PORT;
 
     public EmailService(JavaMailSender mailSender, TemplateEngine templateEngine) {
         this.mailSender = mailSender;
@@ -18,12 +23,12 @@ public class EmailService {
     }
 
     public void sendVerifyEmail(String email, String name, Long activationCode) {
-        String link = "http://localhost:8081/api/user/activate?code=" + activationCode;
+        String link = "http://" + HOST + ":" + PORT + "/api/user/activate?code=" + activationCode;
         String processedHTMLTemplate = this.constructHTMLTemplate(name, link);
         mailSender.send(prepareEmail(email, "Email verification", processedHTMLTemplate));
     }
 
-    private MimeMessagePreparator prepareEmail(String mailTo, String subject, String processedHTMLTemplate){
+    private MimeMessagePreparator prepareEmail(String mailTo, String subject, String processedHTMLTemplate) {
         return message -> {
             MimeMessageHelper helper = new MimeMessageHelper(message, MimeMessageHelper.MULTIPART_MODE_MIXED, "UTF-8");
             helper.setFrom("Artway Space <andrew@elmanov.ru>");

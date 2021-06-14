@@ -1,5 +1,7 @@
 package space.artway.artwayuser.controller;
 
+import javassist.NotFoundException;
+import org.springframework.http.ResponseEntity;
 import space.artway.artwayuser.controller.utils.ManagedUser;
 import space.artway.artwayuser.service.UserService;
 import space.artway.artwayuser.service.dto.UserDto;
@@ -27,6 +29,12 @@ public class UserController {
 
          userService.createUser(user, user.getPassword());
     }
+
+    @PostMapping("/updateUser")
+    public ResponseEntity<UserDto> updateUser(@RequestParam("userId") Long id,  @Valid @RequestBody UserDto user) throws NotFoundException {
+        return ResponseEntity.ok(userService.updateUser(id, user));
+    }
+
 
     @GetMapping("/activate")
     public void activateAccount(@RequestParam Long code){

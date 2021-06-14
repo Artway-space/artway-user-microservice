@@ -1,14 +1,17 @@
 package space.artway.artwayuser.service;
 
+import com.google.common.collect.ImmutableSet;
 import javassist.NotFoundException;
 import org.jeasy.random.EasyRandom;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
+import space.artway.artwayuser.controller.exceptions.NoPermissionException;
 import space.artway.artwayuser.controller.exceptions.UserAlreadyExistException;
 import space.artway.artwayuser.domain.User;
 import space.artway.artwayuser.repository.UserRepository;
+import space.artway.artwayuser.service.dto.AuthoritiesEnum;
 import space.artway.artwayuser.service.dto.UserDto;
 import space.artway.artwayuser.service.mapper.UserMapper;
 
@@ -81,7 +84,7 @@ class UserServiceTest {
 
     @Test
     @DisplayName("Create existing user")
-    void createExitsUser() {
+    void createExistsUser() {
         UserDto userDto = new UserDto();
         userDto.setUsername("username");
 
@@ -91,6 +94,47 @@ class UserServiceTest {
     }
 
     @Test
+    @DisplayName("Create user with role ADMIN")
+    void createAdminUser(){
+        UserDto userDto = new UserDto();
+        userDto.setUsername("username");
+        userDto.setAuthorities(ImmutableSet.of(AuthoritiesEnum.ADMIN));
+
+        assertThrows(NoPermissionException.class, () -> userService.createUser(userDto, "SOME_PASSWORD_HASH"));
+    }
+
+    @Test
     void activate() {
+    }
+
+    @Test
+    @DisplayName("Update user")
+    void updateUser() throws NotFoundException {
+        Long userId = 1L;
+        User oldUser = new EasyRandom().nextObject(User.class);
+        UserDto updatedUser = new UserDto();
+        updatedUser.setEmail("newEmail@example.com");
+
+        ArgumentCaptor<User> capturedUser = ArgumentCaptor.forClass(User.class);
+
+        when(userRepository.findById(anyLong())).thenReturn(Optional.of(oldUser));
+        when(userRepository.save(any(User.class))).thenReturn(new User());
+        userService.updateUser(userId, updatedUser);
+
+        verify(userRepository).save(capturedUser.capture());
+        assertAll(
+                () -> assertEquals(capturedUser.getValue().getId(), oldUser.getId()),
+                () -> assertEquals(capturedUser.getValue().getEmail(), updatedUser.getEmail()),
+                () -> assertEquals(capturedUser.getValue().getUsername(), oldUser.getUsername())
+        );
+    }
+
+    @Test
+    @DisplayName("Update not existing user")
+    void updateNotExistingUser(){
+        UserDto updatedUser = new UserDto();
+        when(userRepository.findById(anyLong())).thenReturn(Optional.empty());
+
+        assertThrows(NotFoundException.class, () -> userService.updateUser(1L, updatedUser));
     }
 }

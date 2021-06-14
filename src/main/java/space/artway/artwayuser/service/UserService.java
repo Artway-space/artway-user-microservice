@@ -1,12 +1,15 @@
 package space.artway.artwayuser.service;
 
+import javassist.NotFoundException;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import space.artway.artwayuser.controller.exceptions.NoPermissionException;
 import space.artway.artwayuser.controller.exceptions.UserAlreadyExistException;
 import space.artway.artwayuser.domain.User;
 import space.artway.artwayuser.repository.UserRepository;
+import space.artway.artwayuser.service.dto.AuthoritiesEnum;
 import space.artway.artwayuser.service.dto.UserDto;
 import space.artway.artwayuser.service.mapper.UserMapper;
-import javassist.NotFoundException;
-import org.springframework.stereotype.Service;
 
 import java.util.Optional;
 import java.util.UUID;
@@ -32,13 +35,17 @@ public class UserService {
     }
 
     public void createUser(UserDto userDto, String passwordHash) {
+        if(userDto.getAuthorities().contains(AuthoritiesEnum.ADMIN)){
+            throw new NoPermissionException("Only admins can create users with role ADMIN");
+        }
+
         if (userRepository.findByUsername(userDto.getUsername()).isPresent()) {
             throw new UserAlreadyExistException();
         }
+
         User user = mapper.toEntity(userDto);
         user.setPasswordHash(passwordHash);
         user.setActivationCode(UUID.randomUUID().getMostSignificantBits());
-        //user.setAuthorities(Collections.singleton(AuthoritiesEnum.USER));
 
         User savedUser = userRepository.save(user);
         emailService.sendVerifyEmail(savedUser.getEmail(), savedUser.getFirstName() + " " + savedUser.getLastName(), savedUser.getActivationCode());
@@ -53,5 +60,16 @@ public class UserService {
         }
     }
 
+    @Transactional
+    public UserDto updateUser(Long userId, UserDto updatedUser) throws NotFoundException {
+        Optional<User> userOptional = userRepository.findById(userId);
+        if (!userOptional.isPresent()) {
+            throw new NotFoundException("User not found");
+        }
+        User oldUser = userOptional.get();
+        oldUser = mapper.mapChangedFields(oldUser, mapper.toEntity(updatedUser));
+        userRepository.save(oldUser);
+        return new UserDto();
+    }
 
 }

@@ -1,5 +1,6 @@
 package space.artway.artwayuser.service.dto;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyDescription;
 import lombok.Data;
@@ -7,8 +8,10 @@ import lombok.Data;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.Size;
 import java.util.Date;
+import java.util.Set;
 
 @Data
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class UserDto {
     @Size(min = 1, max = 64)
     @JsonProperty(required = true)
@@ -39,5 +42,5 @@ public class UserDto {
     @JsonPropertyDescription("Country of user")
     private String country;
 
-    private AuthoritiesEnum authority;
+    private Set<AuthoritiesEnum> authorities;
 }
