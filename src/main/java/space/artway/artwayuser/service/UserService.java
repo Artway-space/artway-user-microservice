@@ -7,7 +7,7 @@ import space.artway.artwayuser.controller.exceptions.NoPermissionException;
 import space.artway.artwayuser.controller.exceptions.UserAlreadyExistException;
 import space.artway.artwayuser.domain.User;
 import space.artway.artwayuser.repository.UserRepository;
-import space.artway.artwayuser.service.dto.AuthoritiesEnum;
+import space.artway.artwayuser.service.dto.AuthoritiesConstants;
 import space.artway.artwayuser.service.dto.UserDto;
 import space.artway.artwayuser.service.mapper.UserMapper;
 
@@ -35,7 +35,7 @@ public class UserService {
     }
 
     public void createUser(UserDto userDto, String passwordHash) {
-        if(userDto.getAuthorities().contains(AuthoritiesEnum.ADMIN)){
+        if (userDto.getAuthorities().contains(AuthoritiesConstants.ADMIN)) {
             throw new NoPermissionException("Only admins can create users with role ADMIN");
         }
 

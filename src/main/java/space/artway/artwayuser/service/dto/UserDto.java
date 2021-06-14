@@ -42,5 +42,5 @@ public class UserDto {
     @JsonPropertyDescription("Country of user")
     private String country;
 
-    private Set<AuthoritiesEnum> authorities;
+    private Set<AuthoritiesConstants> authorities;
 }

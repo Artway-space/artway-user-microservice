@@ -1,6 +1,6 @@
 package space.artway.artwayuser.service.dto;
 
-public enum AuthoritiesEnum {
+public enum AuthoritiesConstants {
     CREATOR,
     USER,
     ADMIN

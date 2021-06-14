@@ -3,15 +3,18 @@ package space.artway.artwayuser.service;
 import com.google.common.collect.ImmutableSet;
 import javassist.NotFoundException;
 import org.jeasy.random.EasyRandom;
+import org.jeasy.random.EasyRandomParameters;
+import org.jeasy.random.FieldPredicates;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
 import space.artway.artwayuser.controller.exceptions.NoPermissionException;
 import space.artway.artwayuser.controller.exceptions.UserAlreadyExistException;
+import space.artway.artwayuser.domain.Authority;
 import space.artway.artwayuser.domain.User;
 import space.artway.artwayuser.repository.UserRepository;
-import space.artway.artwayuser.service.dto.AuthoritiesEnum;
+import space.artway.artwayuser.service.dto.AuthoritiesConstants;
 import space.artway.artwayuser.service.dto.UserDto;
 import space.artway.artwayuser.service.mapper.UserMapper;
 
@@ -33,6 +36,7 @@ class UserServiceTest {
     void findUserById() throws NotFoundException {
         long userId = 1234L;
         User user = new EasyRandom().nextObject(User.class);
+        user.setAuthorities(ImmutableSet.of(new Authority("CREATOR")));
         when(userRepository.findById(eq(userId))).thenReturn(Optional.of(user));
 
         UserDto result = userService.findUserById(userId);
@@ -59,7 +63,9 @@ class UserServiceTest {
     @Test
     @DisplayName("Create new user")
     void createUser() {
-        UserDto userDto = new EasyRandom().nextObject(UserDto.class);
+        UserDto userDto = new EasyRandom(new EasyRandomParameters()
+                .randomize(FieldPredicates.named("authorities"), ()->ImmutableSet.of(AuthoritiesConstants.USER))
+        ).nextObject(UserDto.class);
         User user = new EasyRandom().nextObject(User.class);
 
         ArgumentCaptor<User> capturedUser = ArgumentCaptor.forClass(User.class);
@@ -87,6 +93,7 @@ class UserServiceTest {
     void createExistsUser() {
         UserDto userDto = new UserDto();
         userDto.setUsername("username");
+        userDto.setAuthorities(ImmutableSet.of(AuthoritiesConstants.CREATOR));
 
         when(userRepository.findByUsername(anyString())).thenReturn(Optional.of(new User()));
 
@@ -98,7 +105,7 @@ class UserServiceTest {
     void createAdminUser(){
         UserDto userDto = new UserDto();
         userDto.setUsername("username");
-        userDto.setAuthorities(ImmutableSet.of(AuthoritiesEnum.ADMIN));
+        userDto.setAuthorities(ImmutableSet.of(AuthoritiesConstants.ADMIN));
 
         assertThrows(NoPermissionException.class, () -> userService.createUser(userDto, "SOME_PASSWORD_HASH"));
     }

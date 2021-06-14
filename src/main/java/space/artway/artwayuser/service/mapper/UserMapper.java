@@ -2,7 +2,7 @@ package space.artway.artwayuser.service.mapper;
 
 import space.artway.artwayuser.domain.Authority;
 import space.artway.artwayuser.domain.User;
-import space.artway.artwayuser.service.dto.AuthoritiesEnum;
+import space.artway.artwayuser.service.dto.AuthoritiesConstants;
 import space.artway.artwayuser.service.dto.UserDto;
 import org.springframework.stereotype.Service;
 
@@ -54,11 +54,11 @@ public class UserMapper {
         return oldField;
     }
 
-    private Set<Authority> authoritiesFromEnum(Set<AuthoritiesEnum> authoritiesEnums) {
+    private Set<Authority> authoritiesFromEnum(Set<AuthoritiesConstants> authoritiesConstants) {
         Set<Authority> authorities = new HashSet<>();
 
-        if (authoritiesEnums != null) {
-            authorities = authoritiesEnums.stream()
+        if (authoritiesConstants != null) {
+            authorities = authoritiesConstants.stream()
                     .map(authorityName -> {
                         Authority auth = new Authority();
                         auth.setName(authorityName.name());
@@ -69,14 +69,14 @@ public class UserMapper {
         return authorities;
     }
 
-    private Set<AuthoritiesEnum> authoritiesFromEntity(Set<Authority> authorities) {
-        Set<AuthoritiesEnum> authoritiesEnums = new HashSet<>();
+    private Set<AuthoritiesConstants> authoritiesFromEntity(Set<Authority> authorities) {
+        Set<AuthoritiesConstants> authoritiesConstants = new HashSet<>();
 
         if (authorities != null) {
-            authoritiesEnums = authorities.stream()
-                    .map(authority -> AuthoritiesEnum.valueOf(authority.getName()))
+            authoritiesConstants = authorities.stream()
+                    .map(authority -> AuthoritiesConstants.valueOf(authority.getName()))
                     .collect(Collectors.toSet());
         }
-        return authoritiesEnums;
+        return authoritiesConstants;
     }
 }
